@@ -1,9 +1,11 @@
 package queen
 
 import (
-	"testing"
 	"math"
+	"testing"
 )
+
+const testFieldSize int = 16
 
 func TestRandomInit(t *testing.T) {
 	for i := 0; i < 5; i++ {
@@ -11,15 +13,21 @@ func TestRandomInit(t *testing.T) {
 		testSize := int(math.Exp2(float64(i)))
 
 		testQueen := GenerateRandom(testSize)
-		if (testQueen.x > testSize || testQueen.x < 0) {
+		if testQueen.x > testSize || testQueen.x < 0 {
 			t.Errorf("Queen %d failed, mismatching Position x", testSize)
 			t.Fail()
 		}
 	}
-
 }
 
-func TestEquals(t *testing.T){
+func TestGenerate(t *testing.T) {
+	testQueen := Generate(3, 42)
+	if testQueen.GetX() != 3 || testQueen.GetY() != 42 {
+		t.Fail()
+	}
+}
+
+func TestEquals(t *testing.T) {
 	q1 := Queen{x: 4, y: 1}
 	q3 := Queen{x: 4, y: 1}
 	q2 := Queen{x: 4, y: 5}
@@ -27,13 +35,13 @@ func TestEquals(t *testing.T){
 	exp := false
 	res := q1.Equals(q2)
 
-	if(exp != res){
+	if exp != res {
 		t.Fail()
 	}
 	exp = true
 	res = q1.Equals(q3)
 
-	if(exp != res){
+	if exp != res {
 		t.Fail()
 	}
 
@@ -53,78 +61,96 @@ func TestCaptures(t *testing.T) {
 	//vertical
 	exp := true
 	res := q1.Captures(q2)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q2.Captures(q1)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	exp = false
 	res = q1.Captures(q3)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q3.Captures(q1)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	//horizontal
 	exp = true
 	res = q3.Captures(q4)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q4.Captures(q3)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	exp = false
 	res = q4.Captures(q2)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q2.Captures(q4)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	//cross right
 	exp = true
 	res = q1.Captures(q5)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q5.Captures(q1)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	exp = false
 	res = q1.Captures(q4)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q4.Captures(q1)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 
 	//cross left
 	exp = true
 	res = q5.Captures(q6)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q6.Captures(q5)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	exp = false
 	res = q2.Captures(q6)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
 	res = q6.Captures(q2)
-	if (exp != res) {
+	if exp != res {
 		t.Error()
 	}
+}
+
+func TestMutate(t *testing.T) {
+	for i := 0; i < 100; i++ {
+
+		testQueen := GenerateRandom(testFieldSize)
+		testQueenCopy := Generate(testQueen.GetX(), testQueen.GetY())
+		testQueen.Mutate(testFieldSize)
+		if testQueen.Equals(testQueenCopy) {
+			t.Error("Mutation Test Failed. Resulting Queen equals initial")
+			t.Fail()
+		}
+		if testQueen.GetX() > testFieldSize || testQueen.GetY() > testFieldSize {
+			t.Error("Mutated Queen out of field")
+			t.Fail()
+		}
+	}
+
 }
